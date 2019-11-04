@@ -1,0 +1,25 @@
+version: "3"
+services:
+  echo-srv:
+    build: .
+    ports:
+        - "9090:9091"
+    depends_on:
+        - rediska
+        - mongodb
+  rediska:
+    image: redis
+    ports:
+        - "6380:6379"
+  mongodb:
+    image: mongo
+    ports:
+        - "27017:27017"
+        - "28017:28017"
+    volumes:
+        - ./database/mongo:/data/db
+    restart: always
+    environment:
+        - MONGO_INITDB_ROOT_USERNAME=user
+        - MONGO_INITDB_ROOT_PASSWORD=password
+        - MONGO_INITDB_DATABASE=mydb
