@@ -3,7 +3,7 @@ services:
   echo-srv:
     build: .
     ports:
-        - "9090:9091"
+        - "8082:8080"
     depends_on:
         - rediska
         - mongodb
@@ -15,11 +15,6 @@ services:
     image: mongo
     ports:
         - "27017:27017"
-        - "28017:28017"
     volumes:
         - ./database/mongo:/data/db
     restart: always
-    environment:
-        - MONGO_INITDB_ROOT_USERNAME=user
-        - MONGO_INITDB_ROOT_PASSWORD=password
-        - MONGO_INITDB_DATABASE=mydb
