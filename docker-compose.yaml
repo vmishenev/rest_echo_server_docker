@@ -1,20 +1,12 @@
 version: "3"
 services:
-  echo-srv:
+  balancer-srv:
     build: .
     ports:
-        - "8082:8080"
+        - "8086:8080"
     depends_on:
         - rediska
-        - mongodb
   rediska:
     image: redis
     ports:
-        - "6380:6379"
-  mongodb:
-    image: mongo
-    ports:
-        - "27017:27017"
-    volumes:
-        - ./database/mongo:/data/db
-    restart: always
+        - "6381:6379"

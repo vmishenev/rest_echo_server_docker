@@ -1,22 +1,12 @@
 #!/usr/bin/env python
 
-from pymongo import MongoClient
-import socket
-import logging
-import redis
+
 import json
 import web
+import hashlib
+import redis
+import requests
 
-# add filemode="w" to overwrite
-#logging.basicConfig(filename="/var/log/server.log", level=logging.INFO)
-
-
-
-
-
-client = MongoClient(host='mongodb', port=27017)
-db=client.mydb
-coll = db.mycoll
 
 
 cache = redis.Redis(host='rediska', port=6379)
@@ -26,6 +16,10 @@ cache.ping()
 # For each end point there is a method that handles
 # it in the HandleRequest class
 urls = (r'/storage/?(?P<key>.+)?', 'HandleRequest')
+
+def get_server(key):
+   num = abs(hash(key)) % 2
+   return ["http://localhost:8083", "http://localhost:8083" ][num]
 
 # This class is used to handle requests
 class HandleRequest():
@@ -48,13 +42,9 @@ class HandleRequest():
             answ = cache.get(key)
             response = { }
             if answ == None:
-                
-                db_doc = coll.find_one({"key":key})
-                if db_doc == None:
-                   response["Status"] = "Not found"
-                else:
-                   response["message"] = db_doc["msg"]
-                   response["Status"] = "OK"
+                r = requests.delete(get_server(key) +"/storage/" + key)
+                response = r.json()
+                if response["Status"] == "OK":
                    cache.set(key, response["message"]) #update chache
             else:
 
@@ -82,14 +72,9 @@ class HandleRequest():
         if key is None:
             raise web.badrequest()
         else:
-            response = {}
-            if cache.exists(key) :
-                response["Status"] = "Created" 
-            else:
-                response["Status"] = "OK"
             obj_data = json.loads(web.data())
-            coll.insert_one({"key":key, "msg":obj_data["message"]})
-            return json.dumps(response)
+            r = requests.put(get_server(key) +"/storage/"+key, json=obj_data)
+            return e
     
     #--------------------------------------------
  
@@ -100,14 +85,8 @@ class HandleRequest():
             raise web.badrequest()
         else:
             response = {}
-            db_doc = coll.find_one({"key": key})
-            if db_doc != None :    
-                coll.remove(db_doc)
-                cache.delete(key )
-                response["Status"] = "OK" 
-            else:
-                response["Status"] = "Not found"
-            return json.dumps(response)
+            cache.delete(key )
+            return requests.delete(get_server(key) +"/storage/" + key)
  
     #--------------------------------------------
  
