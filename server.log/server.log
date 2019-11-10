@@ -1,0 +1,9 @@
+WARNING:root:no data in cache for key key-test
+ERROR:root:no data in database for key key-test
+WARNING:root:no data in cache for key key-test
+ERROR:root:no data in database for key key-test
+WARNING:root:no data in cache for key key-test
+ERROR:root:no data in database for key key-test
+INFO:root:http-get for key key-test
+WARNING:root:no data in cache for key key-test
+ERROR:root:no data in database for key key-test

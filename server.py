@@ -8,7 +8,7 @@ import json
 import web
 
 # add filemode="w" to overwrite
-#logging.basicConfig(filename="/var/log/server.log", level=logging.INFO)
+logging.basicConfig(filename="/var/log/server.log", level=logging.INFO) 
 
 
 
@@ -40,18 +40,19 @@ class HandleRequest():
                                
    # Handle HTTP GET
     def GET(self, key=None):
-       # If no id is provided list all cars
+        logging.info('http-get for key %s', key)
         if key is None:
            raise web.badrequest()
-        # Otherwise send back the requested car object
         else:
             answ = cache.get(key)
+            logging.debug('get for key %s', key)
             response = { }
             if answ == None:
-                
+                logging.warning('no data in cache for key %s', key)
                 db_doc = coll.find_one({"key":key})
                 if db_doc == None:
                    response["Status"] = "Not found"
+                   logging.error('no data in database for key %s', key)
                 else:
                    response["message"] = db_doc["msg"]
                    response["Status"] = "OK"
@@ -79,6 +80,7 @@ class HandleRequest():
  
     # Handle HTTP PUT
     def PUT(self, key=None):
+        logging.info('http-PUT for key %s', key)
         if key is None:
             raise web.badrequest()
         else:
@@ -95,6 +97,7 @@ class HandleRequest():
  
     # Handle HTTP DELETE
     def DELETE(self, key=None):
+        logging.info('http-delete for key %s', key)
         # You can not delete a car if id does not exist
         if key is None:
             raise web.badrequest()

@@ -7,6 +7,8 @@ services:
     depends_on:
         - rediska
         - mongodb
+    volumes:
+        - ./server.log:/var/log
   rediska:
     image: redis
     ports:
