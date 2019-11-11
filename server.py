@@ -72,12 +72,16 @@ class HandleRequest:
             raise web.badrequest()
         else:
             response = {}
-            if cache.exists(key):
+            obj_data = json.loads(web.data())
+            db_doc = coll.find_one({'key': key})
+            if db_doc == None:
                 response['Status'] = 'Created'
+                coll.insert_one({'key': key, 'msg': obj_data['message']})
             else:
                 response['Status'] = 'OK'
-            obj_data = json.loads(web.data())
-            coll.insert_one({'key': key, 'msg': obj_data['message']})
+                db_doc['msg'] = obj_data['message']
+                if cache.exists(key):
+                    cache.set(key, obj_data['message'])
             return json.dumps(response)
 
     # --------------------------------------------
@@ -88,7 +92,18 @@ class HandleRequest:
         if key is None:
             raise web.badrequest()
         else:
-            raise web.badrequest()
+            response = {}
+            obj_data = json.loads(web.data())
+            db_doc = coll.find_one({'key': key})
+            if db_doc != None:
+                db_doc['msg'] = obj_data['message']
+                if cache.exists(key):
+                    cache.set(key, obj_data['message'])
+                response['Status'] = 'OK'
+            else:
+                response['Status'] = 'Not found'
+                raise web.notfound(json.dumps(response))
+            return json.dumps(response)
 
     # --------------------------------------------
 
