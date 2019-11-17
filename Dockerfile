@@ -1,9 +1,7 @@
 FROM python:3
 
-RUN pip3 install redis
-RUN pip3 install pymongo
-RUN pip3 install web.py
-RUN pip3 install requests
+COPY ./requirements.txt /requirements.txt
+RUN pip install -r requirements.txt
 COPY ./server.py /
 
 EXPOSE 9091
