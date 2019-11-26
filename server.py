@@ -55,7 +55,7 @@ class HandleRequest:
                     cache.set(key, response['message'])  # update chache
             else:
 
-                if type(answ) is bytes:
+                if isinstance(answ, bytes):
                     response['message'] = answ.decode('utf-8')
                 else:
                     response['message'] = answ
